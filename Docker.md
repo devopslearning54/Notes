@@ -37,13 +37,66 @@ Generation 2: virtual Machines
  Consider container as an isolated area with cpu, ram and network which makes application belive that it running on full blown os.
  Since containers are light weight we can run many containers on the server.
 
- Installation:
+What does it take to run applications?
+ 
+ Lets consider bookmy show as an application example
+
+ ![](Images/Image-2.JPG)
+  
+  To run the application , we require the following components:
+
+
+1. necessary softwares to be installed (java)
+2. Software package to be downloaded (spring petclinic)
+3. network: ipaddress and port
+4. cpu, ram and disk
+ 
+Lets see what container offers
+
+Inside the container also,
+
+we have an os
+
+1. network
+2. cpu/ram/storage
+3. necessary softwares
+4. we downloaded package
+5. we executed application.
+ 
+
+Installation on centos:8 :
+
+```
+ sudo yum install -y yum-utils
+```
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.rep
+```
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+```
+sudo systemctl start docker
+```
+usermod -aG docker centos
+
+or 
+
+```
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+sudo docker run hello-world
 
  Once docker is installed a group created with the name docker.
 
  To run the docker commands, user needs to be added in docker group.
 
  usermod -aG docker centos
+
+Docker has two major components
+
+1. Client
+2. Engine/Runtime/Server
+
+![](Images/Image-3.JPG)
 
  Docker commands:
  -----------------------------------
@@ -90,5 +143,73 @@ Generation 2: virtual Machines
     -- To login inside the container.
 ```
 13. docker logs <container-id>
-```
     -- To see the logs of the running container.     
+```
+docker run <container-ID> command
+
+command --> env --> it will display the environment variables
+
+Sample Docker file
+---------------------------------------
+
+```
+FROM openjdk:11
+LABEL author=AnilKumar
+RUN wget https://referenceapplicationskhaja.s3.us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
+EXPOSE 8080
+CMD ["java", "-jar", "/spring-petclinic-2.4.2.jar"]
+
+In the above Dockerfile the instructions are
+
+FROM
+
+LABEL
+
+RUN
+
+EXPOSE
+
+CMD
+
+This Dockerfile when executed with 
+```docker image build -t <image>:<tag> <directory with docker file>```
+
+will try to create a container based on base image and run all the necessary instructions and creates the image
+
+When we start the container from image whatever is mentioned in CMD/ENTRYPOINT gets executed.
+
+ADD vs COPY
+-----------------
+ADD also copy files from local to container, it has 2 extra options
+
+1. it can directly get the content from internet and copy
+2. it can directly untar the file to the location
+
+CMD vs ENTRYPOINT
+---------------------
+1. CMD command can be overriden by any command.
+2. ENTRYPOINT can't be overriden
+3. You cant override entrypoint, if you try to do it will do and append to entrypoint
+4. If user is not giving any options, CMD can supply default arguments to ENTRYPOINT
+5. user can always override CMD through terminal
+
+for best results combine both entrypoint and cmd
+
+ARG vs ENV
+-------------------
+1. ARG variables only work in build time, but ENV variables can work in build as well as runtime/in container.
+RUN vs CMD
+CMD vs ENTRYPOINT
+ADD vs COPY
+
+ONBUIILD
+-------------
+We are developing docker images, someone else may use our images...
+
+as a image developer, I need to make some rules
+
+ONBUIILD instruction will not execute at the time of image build by developer...
+
+ONBUIILD will execute at the time of some one use your image.
+
+
