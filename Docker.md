@@ -88,6 +88,7 @@ Generation 2: virtual Machines
 
 12. docker exec -it <id> bash/sh
     -- To login inside the container.
-
+```
 13. docker logs <container-id>
+```
     -- To see the logs of the running container.     
